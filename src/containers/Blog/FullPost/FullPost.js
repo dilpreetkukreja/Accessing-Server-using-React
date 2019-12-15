@@ -4,16 +4,19 @@ import axios from 'axios';
 
 class FullPost extends Component {
     state = {
-        selectedPost: null,
         hasLoaded: false,
         error: false
     }
     
-    componentDidUpdate(prevProps, prevState){
-        console.log('[FullPost.js componentDidUpdate]');
-        if(prevProps.selectedId!==this.props.selectedId){
+    callApi = () =>{
+        
+    }
+    componentDidMount(prevProps){
+        console.log('[FullPost.js componentDidMount]');
+        console.log('[FullPost.js componentDidMount] prevProps', prevProps);
+        if(this.props.match.params.id){
             console.log('Accessing server...');
-            axios.get('/posts/'+this.props.selectedId)
+            axios.get('/posts/'+this.props.match.params.id)
             .then(response => {
                 console.log(response);
                 this.setState({
@@ -25,6 +28,27 @@ class FullPost extends Component {
                 this.setState({error: true});
             })
         } 
+    }
+    componentDidUpdate(prevProps){
+        console.log('FullPost.js: componentDidUpdate');
+        console.log('[FullPost.js: componentDidUpdate] prevProps:',prevProps);
+        if(prevProps.match.params.id!==this.props.match.params.id){
+            console.log('Accessing server...');
+            axios.get('/posts/'+this.props.match.params.id)
+            .then(response => {
+                console.log(response);
+                this.setState({
+                    selectedPost: response.data,
+                    hasLoaded: true
+                })
+            })
+            .catch(error=>{
+                this.setState({error: true});
+            })
+        }
+    }
+    componentWillUnmount(){
+        console.log('FullPost:', this.componentWillUnmount);
     }
 
     deletePostHandler = () => {
@@ -56,10 +80,12 @@ class FullPost extends Component {
                     </div>
             );
         }*/
-        console.log('selectedId:',this.props.selectedId, 'selectedPost:', this.state.selectedPost);
+        console.log('selectedPost:', this.state.selectedPost);
+        console.log('FullPost.js props', this.props);
         let post = <p>Please select a Post!</p>;
+        
 
-        if(this.props.selectedId){
+        if(this.props.match.params.id){
             if(this.state.error){
                 post = <div>Error accessing server</div>
             }

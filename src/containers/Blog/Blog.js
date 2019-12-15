@@ -1,64 +1,28 @@
 import React, { Component } from 'react';
-
-import Post from '../../components/Post/Post';
-import FullPost from '../../components/FullPost/FullPost';
-import NewPost from '../../components/NewPost/NewPost';
 import './Blog.css';
 //import axios from 'axios';
-import axios from '../../axios';
+import Posts from './Posts/Posts';
+import {BrowserRouter as Router, NavLink, Route, Switch, Redirect} from 'react-router-dom';
+import NewPost from "./NewPost/NewPost";
+//import FullPost from "./FullPost/FullPost";
 
 class Blog extends Component {
-    state = {
-        posts: [],
-        selectedId: null,
-        error: false
-    }
-    clickHandler = (id) => {
-        this.setState({selectedId: id})
-    }
-    componentDidMount(){
-        console.log('[Blog.js componentDidMount]')
-        axios.get('/posts/')
-            .then(response=>{
-                let posts = response.data.slice(0,4);
-                let updatedPosts = posts.map(post=>{
-                    return {
-                        ...post,
-                        author:'Jasnoor'
-                    }
-                });
-                this.setState({posts: updatedPosts});
-            }) 
-            .catch(error=> this.setState({error: true}));
-
-    }
-
     render () {
-                let posts = <div>Something went wrong!</div>
-                if(!this.state.error){
-                    posts = (
-                        this.state.posts.map(post=>{
-                            return <Post key={post.id} 
-                                    id={post.id}
-                                    title={post.title} 
-                                    author={post.author}
-                                    click={this.clickHandler}/>
-                            })   
-                    );                      
-                }
                 return(
-                    <div>
-                        <section className="Posts">
-                            {posts}
-                        </section>
+                    <Router>
+                        <header className="Blog">
+                            <li><NavLink to="/posts" exact>Posts</NavLink></li>
+                            <li><NavLink to="/new-post">New Post</NavLink></li>
+                        </header>
                         <section>
-                            {/*<FullPost selectedId={this.state.selectedId} posts={this.state.posts}/>*/}
-                            <FullPost selectedId={this.state.selectedId}/>
-                        </section>
-                        <section>
-                            <NewPost />
-                        </section>
-                    </div>
+                            <Switch>
+                                <Route path="/new-post" component={NewPost} />  
+                                <Route path="/posts" component={Posts}/>   
+                                <Redirect from='/' to='/posts' />
+                            </Switch>
+                          
+                        </section> 
+                    </Router>
                 );
     }
 }
